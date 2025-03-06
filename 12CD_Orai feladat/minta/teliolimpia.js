@@ -28,43 +28,36 @@ app.get("/", (req, res) => {
 });
 
 app.get('/helyszinek', (req, res) => {
-    const sql = "SELECT * FROM helyszinek WHERE aktualis = 1";
-    db.query(sql, (err, results) => {
-        if (err) {
-            res.status(500).send('Hiba történt a helyszínek lekérdezésekor');
-            return;
-        }
-        res.json(results);
+    const query = 'SELECT varos, helyszin FROM sportagak';
+    db.query(query, (err, results) => {
+      if (err) throw err;
+      res.json(results);
     });
-});
-
-app.get('/eremszerzok', (req, res) => {
-    const sql = "SELECT * FROM eredmenyek ORDER BY helyezes ASC";
-    db.query(sql, (err, results) => {
-        if (err) {
-            res.status(500).send('Hiba történt az éremszerzők lekérdezésekor');
-            return;
-        }
-        res.json(results);
+  });
+ 
+ 
+  app.get('/eremhelyek', (req, res) => {
+    const query = 'SELECT helyezes, orszag, arany, ezust, bronz FROM rpgyorskorcsolyaeredmenyek ORDER BY helyezes ASC';
+    db.query(query, (err, results) => {
+      if (err) throw err;
+      res.json(results);
     });
-});
-
-app.get('/magyar_eremszerzok', (req, res) => {
-    const sql = `
-        SELECT s.helyszin, m.helyezes, t.tav 
-        FROM magyarermesek m
-        JOIN rpgytavok t ON m.tavID = t.tavID
-        JOIN sportagak s ON m.sportagID = s.sportagID
-        ORDER BY m.helyezes ASC
+  });
+ 
+ 
+  app.get('/magyarermesek', (req, res) => {
+    const query = `
+      SELECT s.varos AS Helyszin, m.helyezes AS Helyezes, t.tav AS Tav
+      FROM magyarermesek m
+      JOIN sportagak s ON m.sportagID = s.sportagID
+      JOIN rpgytavok t ON m.tavID = t.tavID
+      WHERE s.varos = 'Peking'
     `;
-    db.query(sql, (err, results) => {
-        if (err) {
-            res.status(500).send('Hiba történt a magyar éremszerzők lekérdezésekor');
-            return;
-        }
-        res.json(results);
+    db.query(query, (err, results) => {
+      if (err) throw err;
+      res.json(results);
     });
-});
+  });
 
 app.listen(3000, () => {
     console.log("A téliolimpia szervere a 3000-es porton fut.");
